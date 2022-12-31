@@ -20,3 +20,8 @@
   <img src="https://github.com/devicons/devicon/blob/master/icons/git/git-original-wordmark.svg" title="Git" **alt="Git" width="40" height="40"/>&nbsp;
 </div>
 
+
+<p align="left">
+  <img width="48%" src="https://github-readme-stats.vercel.app/api?username=1mazin&show_icons=true&theme=tokyonight" />
+  <img width="48%" src="https://github-readme-streak-stats.herokuapp.com/?user=1mazin&theme=tokyonight" />
+</p>
