@@ -2,8 +2,9 @@
 <div align="center">
   <img src="https://media.giphy.com/media/dWesBcTLavkZuG35MI/giphy.gif" width="600" height="300"/>
 </div>
-<div>
-  </div
+---
+
+
 
   <h2><b>:hammer_and_wrench: Languages and Tools :</b></h2>
 <div>
