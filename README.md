@@ -1,6 +1,6 @@
 <h1>Hey I'm Mehnaz</h1>
 <div align="center">
-  <img src="[[https://media.giphy.com/media/dWesBcTLavkZuG35MI/giphy.gif](https://twitter.com/SpaceCatPics/status/1153654129224507392)](https://twitter.com/SpaceCatPics/status/1153654129224507392)" width="600" height="300"/>
+  <img src="https://media.giphy.com/media/dWesBcTLavkZuG35MI/giphy.gif" width="600" height="300"/>
 </div>
 <div>
   </div
