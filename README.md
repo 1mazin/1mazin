@@ -2,6 +2,14 @@
 <div align="center">
   <img src="https://media.giphy.com/media/dWesBcTLavkZuG35MI/giphy.gif" width="600" height="300"/>
 </div>
+<p align="left"> <img src="https://komarev.com/ghpvc/?username=1mazin&color=red" alt="kusumpriya19" /> </p>
+
+- 🌱 I’m currently learning **Web development , DSA , ML**
+
+- 🤝 I'm eager to know about **opportunities which will help me in expanding my potential.** 
+
+
+<p align="left">
 <div>
 <h2><b>:hammer_and_wrench: Languages and Tools :</b></h2>
  </div>
