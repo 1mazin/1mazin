@@ -2,15 +2,15 @@
 <div align="center">
   <img src="https://media.giphy.com/media/dWesBcTLavkZuG35MI/giphy.gif" width="600" height="300"/>
 </div>
-<p align="left"> <img src="https://komarev.com/ghpvc/?username=1mazin&color=red" alt="mehnaz" /> </p>
+<p align="left"> 
 
 - 🌱 I’m currently learning **DSA ,Web development, ML** .
 
 - 🤝 I'm eager to know about **opportunities which will help me in expanding my potential.** 
 
 - 📫 Reach me at mehnazuluwar@gmail.com
-
-<p align="left">
+</p>
+<p align="left"></p>
 <div>
 <h2><b>:hammer_and_wrench: Languages and Tools :</b></h2>
  </div>
