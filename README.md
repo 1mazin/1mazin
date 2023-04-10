@@ -40,6 +40,6 @@
 
 ---
 <p align="left">
-  <img width="48%" src="https://github-readme-stats.vercel.app/api?username=1mazin&show_icons=true&theme=tokyonight&PAT_1" />
+  <img width="46%" src="https://github-readme-stats.vercel.app/api?username=1mazin&show_icons=true&theme=tokyonight&PAT_1" />
   <img width="48%" src="https://github-readme-streak-stats.herokuapp.com/?user=1mazin&theme=tokyonight" />
 </p>
