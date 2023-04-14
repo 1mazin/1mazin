@@ -6,7 +6,7 @@
 
 - 🌱 I’m currently learning **Web development, ML** .
 
-- 🤝 I'm eager to know about **opportunities which will help me in expand my potential.** 
+- 🤝 I'm eager to know about **opportunities which will help me to expand my potential.** 
 
 - 📫 Reach me at mehnazuluwar@gmail.com
 </p>
