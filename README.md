@@ -1,4 +1,4 @@
-<h1>Hey I'm Mehnaz 👋</h1>
+<h1>Hey 👋</h1>
 <div align="center">
 <img src="https://media3.giphy.com/media/3kPDmoWdBpQPNhCnUG/giphy.gif?cid=ecf05e47w54vkk9m43sjgdenjl2f6p8cpkyebgvjfm09uk8g&rid=giphy.gif&ct=s" width=600 height=300/> 
 </div>
