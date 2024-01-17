@@ -1,0 +1,664 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/1mazin/1mazin/blob/main/Video%20Summarizer\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "VIDEO TO TEXT CONVERSION"
+      ],
+      "metadata": {
+        "id": "EG2mFjNpPyuE"
+      }
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "w4ah7bCLQKnf",
+        "outputId": "7987cbe0-58d2-4b84-ceca-d1a7702a81fc"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Collecting SpeechRecognition\n",
+            "  Downloading SpeechRecognition-3.8.1-py2.py3-none-any.whl (32.8 MB)\n",
+            "\u001b[K     |████████████████████████████████| 32.8 MB 1.1 MB/s \n",
+            "\u001b[?25hInstalling collected packages: SpeechRecognition\n",
+            "Successfully installed SpeechRecognition-3.8.1\n",
+            "Collecting Wave\n",
+            "  Downloading Wave-0.0.2.zip (38 kB)\n",
+            "Building wheels for collected packages: Wave\n",
+            "  Building wheel for Wave (setup.py) ... \u001b[?25l\u001b[?25hdone\n",
+            "  Created wheel for Wave: filename=Wave-0.0.2-py3-none-any.whl size=1240 sha256=cd9d0ecf156dcd9eef01a64bd9aa52eb5d54798240c0f39b5ff2c9328b0c3dfc\n",
+            "  Stored in directory: /root/.cache/pip/wheels/25/e8/fe/458c7dac00c6abedad6380b9d0ef1a5cbc7c21807df1d30915\n",
+            "Successfully built Wave\n",
+            "Installing collected packages: Wave\n",
+            "Successfully installed Wave-0.0.2\n",
+            "Requirement already satisfied: moviepy in /usr/local/lib/python3.7/dist-packages (0.2.3.5)\n",
+            "Requirement already satisfied: tqdm<5.0,>=4.11.2 in /usr/local/lib/python3.7/dist-packages (from moviepy) (4.64.0)\n",
+            "Requirement already satisfied: numpy in /usr/local/lib/python3.7/dist-packages (from moviepy) (1.21.6)\n",
+            "Requirement already satisfied: decorator<5.0,>=4.0.2 in /usr/local/lib/python3.7/dist-packages (from moviepy) (4.4.2)\n",
+            "Requirement already satisfied: imageio<3.0,>=2.1.2 in /usr/local/lib/python3.7/dist-packages (from moviepy) (2.4.1)\n",
+            "Requirement already satisfied: pillow in /usr/local/lib/python3.7/dist-packages (from imageio<3.0,>=2.1.2->moviepy) (7.1.2)\n"
+          ]
+        }
+      ],
+      "source": [
+        "!pip install SpeechRecognition\n",
+        "!pip install Wave\n",
+        "!pip install moviepy\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "C3PwumCLSLSc",
+        "outputId": "268cc56c-0e55-4f84-c042-91a29f2c8213"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Imageio: 'ffmpeg-linux64-v3.3.1' was not found on your computer; downloading it now.\n",
+            "Try 1. Download from https://github.com/imageio/imageio-binaries/raw/master/ffmpeg/ffmpeg-linux64-v3.3.1 (43.8 MB)\n",
+            "Downloading: 8192/45929032 bytes (0.0%)\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b3072000/45929032 bytes (6.7%)\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b6324224/45929032 bytes (13.8%)\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b9379840/45929032 bytes (20.4%)\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b12623872/45929032 bytes (27.5%)\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b15949824/45929032 bytes (34.7%)\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b19079168/45929032 bytes (41.5%)\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b22216704/45929032 bytes (48.4%)\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b25206784/45929032 bytes (54.9%)\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b28401664/45929032 bytes (61.8%)\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b31457280/45929032 bytes (68.5%)\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b34676736/45929032 bytes (75.5%)\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b37396480/45929032 bytes (81.4%)\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b40140800/45929032 bytes (87.4%)\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b43130880/45929032 bytes (93.9%)\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b45929032/45929032 bytes (100.0%)\n",
+            "  Done\n",
+            "File saved as /root/.imageio/ffmpeg/ffmpeg-linux64-v3.3.1.\n",
+            "[MoviePy] Writing audio in transcribed_speech.wav\n"
+          ]
+        },
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "100%|██████████| 46008/46008 [00:35<00:00, 1294.64it/s]"
+          ]
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "[MoviePy] Done.\n"
+          ]
+        },
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "\n"
+          ]
+        }
+      ],
+      "source": [
+        "import wave, math, contextlib\n",
+        "import speech_recognition as sr\n",
+        "from moviepy.editor import AudioFileClip\n",
+        "transcribed_audio_file_name = \"transcribed_speech.wav\"\n",
+        "zoom_video_file_name = \"Bolna.mp4\"\n",
+        "audioclip = AudioFileClip(zoom_video_file_name)\n",
+        "audioclip.write_audiofile(transcribed_audio_file_name)\n",
+        "with contextlib.closing(wave.open(transcribed_audio_file_name,'r')) as f:\n",
+        "    frames = f.getnframes()\n",
+        "    rate = f.getframerate()\n",
+        "    duration = frames / float(rate)\n",
+        "total_duration = math.ceil(duration / 60)\n",
+        "r = sr.Recognizer()\n",
+        "for i in range(0, total_duration):\n",
+        "    with sr.AudioFile(transcribed_audio_file_name) as source:\n",
+        "        try:\n",
+        "            audio = r.record(source, offset=i*60, duration=60)\n",
+        "            f = open(\"transcript.txt\", \"a\")\n",
+        "            text = r.recognize_google(audio, language = 'en-US', show_all = True)\n",
+        "            f.write(str(text))\n",
+        "            f.write(\" \")\n",
+        "        except:\n",
+        "            record()\n",
+        "\n",
+        "\n",
+        "f.close()\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "TO CLEAN TRANSCRIPT"
+      ],
+      "metadata": {
+        "id": "YOvLocDIe-30"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import bs4 as bs\n",
+        "import urllib.request\n",
+        "import re\n",
+        "import heapq\n",
+        "article = open(\"transcript.txt\", 'r').read()\n",
+        "#article = scraped_data.read()\n",
+        "\n",
+        "parsed_article = bs.BeautifulSoup(article,'lxml')\n",
+        "\n",
+        "\n",
+        "paragraphs = parsed_article.find_all('p')\n",
+        "\n",
+        "article_text = \"\"\n",
+        "\n",
+        "for p in paragraphs:\n",
+        "    article_text += p.text\n",
+        "    # Removing Square Brackets and Extra Spaces\n",
+        "    article_text = re.sub(r'\\[[0-9]*\\]', ' ', article_text)\n",
+        "    article_text = re.sub(r'\\s+', ' ', article_text)\n",
+        "    article_text = re.sub(r'alternative', ' ', article_text)\n",
+        "    article_text = re.sub(r'transcript', ' ', article_text)\n",
+        "    # Removing special characters and digits\n",
+        "    formatted_article_text = re.sub('[^a-zA-Z]', ' ', article_text )\n",
+        "    formatted_article_text = re.sub(r'\\s+', ' ', formatted_article_text)\n",
+        "\n",
+        "print(formatted_article_text)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "IXSWJcJQbMYl",
+        "outputId": "22bf724f-cba6-4389-8fe0-995301fa5a23"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            " Abyss is I m John Gruber and this is microeconomics today I want to I want to cover three things I want to talk about the course details about what is microeconomics and then we ll talk start start the substance of the course by talking about supply and demand couple of points about the course the course love a distinct set of policy angle to it I so do we can all policies government policies my thing so I think it s what makes exciting and interesting angle to understand why we re learning what we re learning I think sometimes hard to understand why the heck you re doing things however confidence Abyss is I m John Gruber and this is microeconomics today I want to I want to cover three things I want to talk about the course details about what is microeconomics and then we ll talk start start the substance of the course by talking about supply and demand couple of points about the course the course love a distinct set of policy angle to it I so do we can all policies government policies my thing so I think it s what makes exciting and interesting angle to understand why we re learning what we re learning I think sometimes hard to understand why the heck you re doing things however that s Abyss is I m John Gruber and this is microeconomics today I want to I want to cover three things I want to talk about the course details about what is microeconomics and then we ll talk start start the substance of the course by talking about supply and demand couple of points about the course the course love a distinct set of policy angle to it I so do we can all policies government policies my thing so I think it s what makes exciting and interesting angle to understand why we learning what we re learning I think sometimes hard to understand why the heck you re doing things however Abyss is I m John Gruber and this is microeconomics today I want to I want to cover three things I want to talk about the course details about what is microeconomics and then we ll talk start start the substance of the course by talking about supply and demand couple of points about the course the course love a distinct set of policy angle to it I so do we can all policies government policies my thing so I think it s what makes exciting and interesting angle to understand why we learning what we re learning I think sometimes hard to understand why the heck you re doing things Abyss is I m John Gruber and this is microeconomics today I want to I want to cover three things I want to talk about the course details about what is microeconomics and then we ll talk start start the substance of the course by talking about supply and demand couple of points about the course the course of a distinct sort of policy angle to it I so do we can all policies government policies my thing so I think it s what makes exciting and interesting angle to understand why we learn what we re learning I think sometimes hard to understand why the heck you re doing things however final True spring a Christian butcher from Wellesley and I ll be hitting it next year that dies much more to these policy issues so I m going to sort of use government policy instead of an organizing theme but it won t be so the dominant theme of the class about my teaching style I don t write everything more responsible for what I say not what I write partly that s because my handwriting is brutal already so what that means is please please do not be afraid to ask me what the hell I just bored Don t just leave please confidence spring Kristen butcher from Wellesley and I ll be hitting it next year that dies much more to these policy issues so I m going to sort of use government policy instead of an organizing theme but it won t be so the dominant theme of the class about my teaching style I don t write everything more responsible for what I say not what I write partly that s because my handwriting is brutal already so what that means is please please do not be afraid to ask me what the hell I just bored Don t just leave please spring a Christian butcher from Wellesley and I ll be hitting it next year that dies much more to these policy issues so I m going to sort of use government policy instead of an organizing theme but it won t be so the dominant theme of the class about my teaching style I don t write everything more responsible for what I say not what I write partly that s because my handwriting is brutal already so what that means is please please do not be afraid to ask me what the hell I m bored Don t just leave please spring of Kristen butcher from Wellesley and I ll be hitting it next year that dies much more to these policy issues so I m going to sort of use government policy instead of an organizing theme but it won t be so the dominant theme of the class about my teaching style I don t write everything more responsible for what I say not what I write partly that s because my handwriting is brutal already so what that means is please please do not be afraid to ask me what the hell I just bored Don t just leave please spring Kristen butcher from Wellesley and I ll be hitting it next year that dies much more to these policy issues so I m going to sort of use government policy instead of an organizing theme but it won t be so the dominant theme of the class about my teaching style I don t write everything more responsible for what I say not what I write partly that s because my handwriting is brutal already so what that means is please please do not be afraid to ask me what the hell I m bored Don t just leave please final True ask question about some related tangent or whatever please feel free to do so you might think how would that work in a class this big there s always way too few questions even the classes fix so never be afraid that like it ll slow me down or whatever asking question we have plenty of time on the class little slow me down so I just class I d like to see looks like it s fairly healthy representation so don t take it personally confidence ask question about some related tangent or whatever please feel free to do so you might think how would that work in a class this big there s always way too few questions even the classes fix so never be afraid that like it ll slow me down or whatever asking question we have plenty of time on the class little slow me down finally so I just class I d like to see looks like it s a fairly healthy representation so don t take it personally ask question about some related tangent or whatever please feel free to do so you might think how would that work in a class this big there s always way too few questions even the classes fix so never be afraid that like it ll slow me down or whatever asking question we have plenty of time on the class little slow me down so I just class I d like to see looks like it s a fairly healthy representation so don t take it personally ask question about some related tangent or whatever please feel free to do so you might think how would that work in a class this big there s always way too few questions even classes fix so never be afraid that like it ll slow me down or whatever asking question we have plenty of time on the class little slow me down so I just class I d like to see looks like it s fairly healthy representation so don t take it personally ask question about some related tangent or whatever please feel free to do so you might think how would that work in a class this big there s always way too few questions even classes fix so never be afraid that like it ll slow me down or whatever asking question we have plenty of time on the class little slow me down so I just class I d like to see looks like it s a fairly healthy representation so don t take it personally final True how many people for how many brownie was a tart really well okay tell him to take the class and your friend still in high school okay so basically what he is is a series of constrained optimization exercise confidence how many people for how many brownie was a tart really well okay tell him to take the class and Your Friends School okay so basically what he is is a series of constrained optimization exercise how many people for how many brownie was at art really well okay tell him to take the class and your friend still in high school okay so basically what he is is a series of constrained optimization exercise how many people for how many for how many was at art really well okay tell him to take the class and your friend still in high school okay so basically what he is is a series of constrained optimization exercise how many people for how many brownie was at art really well okay tell him to take the class and Your Friends School okay so basically what he is is a series of constrained optimization exercise final True given their constraints I will but not as much as I should essentially we have another course in the apartment behavioral economics with gets in that much more I will sprinkle it throughout but but not as much as I truly believe in it in other words the basics down before you start to make yourself as well off as possible and behind this notion of trade offs is going to be confidence given their constraints I will but not as much as I should essential we have another course in the apartment behavioral economics with gets in that much more I will sprinkle it throughout but but not as much as I truly believe in it in other words the basics down before you start to make yourself as well off as possible and behind this notion of trade offs is going to be given their constraints I will but not as much as I should essentially we have another course in the apartment behavioral economics with gets in that much more I will sprinkle it throughout but but not as much as I truly believe in it in other words the basics down before you start to make yourself as well off as possible and behind this notion of trade offs is going to be given their constraints I will but not as much as I should essential we have another course in the apartment behavioral economics with gets in that much more I will sprinkle it throughout but but not as much as I truly believe in it in other words the basics down before you start to make yourself as well off as possible and behind this notion of trade offs is going to be given their constraints I will but not as much as I should essentially we have another course in the apartment behavioral economics with guessing that much more I will sprinkle it throughout but but not as much as I truly believe in it in other words the basics down before you start to make yourself as well off as possible and behind this notion of trade offs is going to be final True concept that we teach them the first concept we teach which is it every action or inaction has a cost that you could have been doing something else instead okay so if you buy a shirt you could have bought pants if you sit at home and watch TV you could have been at working everything you do has a next best you could have done instead and that is called the opportunity cost confidence concept that we teach them the first concept we teach which is it every action or inaction has a cost that you could have been doing something else instead okay so if you buy a shirt you could have bought pants if you sit at home and watch TV you could have been out working everything you do has a next best you could have done instead and that is called the opportunity cost concept that we teach them the first concept we teach which is it every action or inaction has a cost that you could have been doing something else instead okay so if you buy a shirt you could have bought pants if you sit at home and watch TV you could have been at working everything you do has the next best you could have done instead and that is called the opportunity cost concept that we teach them the first concept we teach which is it every action or inaction has a cost that you could have been doing something else instead okay so if you buy a shirt you could have bought pants if you sit at home and watch TV you could have been out working everything you do has the next best you could have done instead and that is called the opportunity cost concept that we teach them the first concept we teach which is it every action or inaction has a cost and that you could have been doing something else instead okay so if you buy a shirt you could have bought pants if you sit at home and watch TV you could have been at working everything you do has a next best you could have done instead and that is called the opportunity cost final True to do another but is it for MIT undergraduate I call it fun and this is why I think MIT is the perfect place we teaching genomics because MIT Engineering is all about constrained optimization F engineering is an economically just the engine is just the principles you live you learn Engineering in different contexts confidence do another but is it for MIT undergraduate I call it fun and this is why I think MIT is the perfect place we teaching genomics because MIT Engineering is all about constrained optimization F engineering is an economically just the engine is just the principles you live you learn Engineering in different contexts to do another but is it for MIT undergraduate I call it fun and this is why I think MIT is the perfect place we teaching genomics because MIT Engineering is all about constrained optimization F engineering is an economically just the engine is just the principles you listen you learn engineering different contacts to do another but is it for MIT undergraduate I call it fun and this is why I think MIT is the perfect place we teaching genomics because MIT Engineering is all about constrained optimization F engineering is an economically just the engine is just the principles you learn engineering different contacts do another but is it for MIT undergraduate I call it fun and this is why I think MIT is the perfect place we teaching genomics because MIT Engineering is all about constrained optimization F engineering is an economically just the engine is just the principles you listen you learn engineering different contacts final True and businesses and understand the decisions that drive our economy okay so same principles you can think of for engineering classes but applied to people flies and that s why I m okay by Paul Samuelson in the s and s who wrote the fundamental textbook that because he was here and applied the principles of MIT taxi develop the field of modern economics what will learn today was developed in Mighty so it s a great place to be learning it would that is background confidence and businesses and understand the decisions that drive our economy okay so same principles you can think of for engineering classes but applied to people flies and that s why it s okay by Paul Samuelson in the s and s who wrote the fundamental textbook that because he was here and applied the principles of MIT taxi develop the field of modern economics what will learn today was developed in Mighty so it s a great place to be learning it would that is background and businesses and understand the decisions that drive our economy okay so same principles you can think of for engineering classes but applied to people flies and that s why I m okay by Paul Samuelson in the s and s who wrote the fundamental textbook that because he was here and applied the principles of MIT taxi develop the field of modern economics what we ll learn today was developed in Mighty so it s a great place to be learning it would that is background and businesses and understand the decisions that drive our economy okay so same principles you can think of for engineering classes but applied to people flies and that s why it s okay by Paul Samuelson in the s and s who wrote the fundamental textbook that because he was here and applied the principles of MIT taxi develop the field of modern economics what we ll learn today was developed in Mighty so it s a great place to be learning it would that is background and businesses and understand the decisions that drive our economy okay so same principles you can think of for engineering classes but applied to people flies and that s why I m okay by Paul Samuelson in the s and s who wrote the fundamental textbook that because he was here and apply the principles of MIT taxi develop the field of modern economics what will learn today was developed in Mighty so it s a great place to be learning it would that is background final True is going to drive you crazy because we re going to proceed by teaching very sit as the very first question pointed out by teaching very simplified models okay we re going to sensually what is a model a model of technically description between any two or more economic virus or any two or more variables okay but unlike the models using all your other classes these aren t loss by enlarge their models so we don t have a relationship we have models but always pretty true pretty being somewhere between and true okay so basically the idea is to make confidence is going to drive you crazy because we re going to proceed by teaching very sit as the very first question pointed out by teaching very simplified models okay we re going to sensually what is a model a model of technically description between any two or more economic virus or any two or more variables okay but unlike the models using all your other classes these aren t loss by enlarged their models so we don t have a relationship we have models but always pretty true pretty being somewhere between and true okay so basically the idea is to make he s going to drive you crazy because we re going to proceed by teaching very sit as the very first question pointed out by teaching very simplified models okay we re going to sensually what is a model a model of technically description between any two or more economic virus or any two or more variables okay but unlike the models using all your other classes these aren t loss by enlarge their models so we don t have a relationship we have models but always pretty true pretty being somewhere between and true okay so basically the idea is to make he s going to drive you crazy because we re going to proceed by teaching very sit as the very first question pointed out by teaching very simplified models okay we re going to sensually what is a model a model of technically description between any two or more economic virus or any two or more variables okay but unlike the models using all your other classes these aren t loss by enlarged their models so we don t have a relationship we have models but always pretty true pretty being somewhere between and true okay so basically the idea is to make is going to drive you crazy because we re going to proceed by teaching very sick as the very first question pointed out by teaching very simplified models okay we re going to sensually what is a model a model of technically description between any two or more economic virus or any two or more variables okay but unlike the models using all your other classes these aren t loss by enlarged their models so we don t have a relationship we have models but always pretty true pretty being somewhere between and true okay so basically the idea is to make a trade off final True model the captures as well as possible the phenomenon the real world like equals mc squared but we want to do so in the most tractable possible way so that we can teach it from first principles and not you know don t need don t need an hour to teach every single every single Insight we have okay so basically we tend to resolve that by erring on the side of tractability that is why I can teach you the entire field confidence model the captures as well as possible the phenomenon the real world like equals mc squared what we want to do so in the most tractable possible way so that we can teach it from first principles and not you know don t need don t need an hour to teach every single every single Insight we have okay so basically we tend to resolve that by erring on the side of tractability that is why I can teach you the entire field model the captures as well as possible the phenomenon the real world like equals mc squared what we want to do so in the most tractable possible way so that we can teach it from first principles and not you know don t need don t need an hour to teach every single every single Insight we have okay so basically we tend to resolve that by erring on the side of tractability that is why I can teach you the entire field model the captures as well as possible the phenomenon the real world like equals mc squared but we want to do so in the most tractable possible way so that we can teach it from first principles and not you know don t need don t need an hour to teach every single every single inside we have okay so basically we tend to resolve that by erring on the side of tractability that is why I can teach you the entire field model the captures as well as possible the phenomenon the real world like equals mc squared what we want to do so in the most tractable possible way so that we can teach it from first principles and not you know don t need don t need an hour to teach every single every single Insight we have okay so basically in economically to resolve that by erring on the side of tractability that is why I can teach you the entire field final True and so that is essential to trade offer going to try to do this semester so the line I like it s just the statistician George box said that all models are wrong but summer useful now obviously doesn t apply do models models in in the hard Sciences but in the social sciences that s true and basically I m like that level is the intuitive level okay I called the passing them on test your mama Thanksgiving or at the end of semester okay Dad s just called them on test okay confidence and so that is essential to trade offer going to try to do this semester so the line I like it s just the statistician George box said that all models are wrong but summer useful now obviously doesn t apply do models models in in the hard Sciences but in the social sciences that s true and basically I like that level is the intuitive level okay I called the passing them on test your mama Thanksgiving or at the end of semester okay Dad s just called them on test okay and so that is essential to trade offer going to try to do this semester so the line I like it s just the statistician George box said that all models are wrong but summer useful now obviously doesn t apply do models models in in the hard Sciences but in the social sciences that s true and basically I m like that level is the intuitive level okay I called the passing them on test your mama Thanksgiving or at the end of semester okay to Dad s just called them on test okay and so that is essential to trade offer going to try to do this semester so the line I like it s just the statistician George box said that all models are wrong but summer useful now obviously doesn t apply do models models in in the hard Sciences but in the social sciences that s true and basically I m going to like that level is the intuitive level okay I called the passing them on test your mama Thanksgiving or at the end of semester okay Dad s just called them on test okay and so that is essential to trade offer going to try to do this semester so the line I like it s just the statistician George box said that all models are wrong but summer useful now obviously doesn t apply do models models in in the hard Sciences but in the social sciences that s true and basically I m going to like that level is the intuitive level okay I called the pass in the mom test your mama Thanksgiving or at the end of semester okay Dad s just called them on test okay final True delivers a lot of shorthand power and the third is mathematical okay the mathematical the least important but it s easiest to test you on so we re going to need to know things mathematically as well okay so let s start by considering the supply and demand model by using the famous example brought up by Adam Smith Adam Smith the father of economics at Paul Simms the father of modern economics economics is book The Wealth of Nations incredible job confidence delivers a lot of shorthand power and the third is mathematical okay the mathematical the least important but it s easiest to test you on so we re going to need to know things mathematically as well okay so let s start by considering the supply and demand model by using the famous example brought up by Adam Smith Adam Smith the father of economics at Paul Simms the father of modern economics economics is book The Wealth of Nations incredible job delivers a lot of shorthand power and the third is mathematical the mathematical the least important but it s easiest to test you on so we re going to need to know things mathematically as well okay so let s start by considering the supply and demand model by using the famous example brought up by Adam Smith Adam Smith the father of economics at Paul Simms the father of modern economics economics is book The Wealth of Nations incredible job Oliver s a lot of shorthand power and the third is mathematical okay the mathematical the least important but it s easiest to test you on so we re going to need to know things mathematically as well okay so let s start by considering the supply and demand model by using the famous example brought up by Adam Smith Adam Smith the father of economics at Paul Simms the father of modern economics economics is book The Wealth of Nations incredible job delivers a lot of shorthand power and the third is mathematical okay the mathematical the least important but it s easiest to test you on so we re going to need to know things mathematically as well okay so let s start by considering the supply and demand model by using the famous example brought up by Adam Smith Adam Smith the father of economics of Paul Simms the father of modern economics economics is book The Wealth of Nations incredible job final True one more frivolous things you can buy certainly irrelevant to reading a successful or happier productive life for any life okay for most of us Waters free and diamonds are super expensive okay how can this be Adam Smith fast will the answer he post is that what I first described was just demand that is we demand lots of water we demand fewer diamonds but we have to match that with the concept of Supply okay and the supply of waters almost infinite supply of diamonds maybe not naturally maybe it s through decisions of various businesses but it s somewhat limited okay so basically what what he developed is that you can t just think of Supply or demand and isolation have to put them together if you want explain the real world phenomena we see a cheap and diamonds confidence one more frivolous things you can buy certainly irrelevant to reading a successful or happier productive life for any life okay for most of us Waters free and diamonds are super expensive okay how can this be Adam Smith fast will the answer he post is that what I first described was just demand that is we demand lots of water we demand fewer diamonds but we have to match that with the concept of Supply okay and the supply of waters almost infinite supply of diamonds maybe not naturally maybe it s through decisions of various businesses but it s somewhat limited okay so basically what what he developed is that you can t just think of Supply or demand and isolation up to put them together if you want explain the real world phenomena we see a cheap and diamonds one more frivolous things you can buy certainly irrelevant to reading a successful or happier productive life for any life okay for most of us Waters free and diamonds are super expensive okay how can this be Adam Smith fast will the answer he post is that what I first described was just demand that is we demand lots of water we demand fewer diamonds but we have to match that with the concept of Supply okay and the supply of waters almost infinite supply of diamonds maybe not naturally maybe it s through decisions of various businesses but it s somewhat limited okay so basically what what he developed is that you can t just think of Supply or demand and isolation of to put them together if you want explain the real world phenomena we see a cheap and diamonds one more frivolous things you can buy certainly irrelevant to reading a successful or happier productive life for any life okay for most of us Waters free and diamonds are super expensive okay how can this be Adam Smith fast will the answer he post is that what I first described was just demand that is we demand lots of water we demand fewer diamonds but we have to match that with the concept of Supply okay and the supply of water s almost infinite supply of diamonds maybe not naturally maybe it s through decisions of various businesses but it s somewhat limited okay so basically what what he developed is that you can t just think of Supply or demand and isolation of to put them together if you want explain the real world phenomena we see a cheap and diamonds one more frivolous things you can buy certainly irrelevant to reading a successful or happier productive life for any life okay for most of us Waters free and diamonds are super expensive okay how can this be Adam Smith fast will the answer he post is that what I first described was just demand that is we demand lots of water we demand fewer diamonds but we have to match that with the concept of Supply okay and the supply of waters almost infinite supply of diamonds maybe not naturally maybe it s through decisions the various businesses but it s somewhat limited okay so basically what what he developed is that you can t just think of Supply or demand and isolation of to put them together if you want explain the real world phenomena we see a cheap and diamonds final True so let s just talk let s talk about an example so there s one Grasso stand out in the back okay which is less talk about the market for Roses okay so in the market for Roses we have a demand curve confidence so let s just talk let s talk about an example so there s one Grasso stand out in the back okay which is let s talk about the market for Roses okay so in the market for Roses we have a demand curve so let s just talk let s talk about an example so there s one grasses hang out in the back okay which is less talk about the market for Roses okay so in the market for Roses we have a demand curve so let s just talk let s talk about an example so there s one Grasso stand out in the back okay which is less talk about the market for Roses okay so in the market for Roses we have a demand curve on the so let s just talk let s talk about an example so there s one grasses hang out in the back okay which is let s talk about the market for Roses okay so in the market for Roses we have a demand curve final True at higher prices people want less of the good and we ll just will derive where that comes from shortly starting next lecture but for now I think it s pretty intuitive than at the price of roses hire people are fewer of them and that s why it s downward sloping okay people want you were roses the yellow curve is the supply curve now after we derive the demand curve will then go harder so basically as the price goes up firms want to produce more roses confidence at higher prices people want less of the good and we ll just will derive where that comes from shortly starting next lecture but for now I think it s pretty intuitive than at the price of roses hire people are few of them and that s why it s downward sloping okay people want you were roses the yellow curve is the supply curve now after we derive the demand curve will then go harder so basically as the price goes up firms want to produce more roses at higher prices people want less of the good and we ll just we ll derive where that comes from shortly starting next lecture but for now I think it s pretty intuitive than at the price of roses hire people are fewer of them and that s why it s downward sloping okay people want you were roses the yellow curve is the supply curve now after we derive the demand curve will then go harder so basically as the price goes up firms want to produce more roses at higher prices people want less of the good and we ll just will derive where that comes from shortly starting next lecture but for now I think it s pretty intuitive than at the price of roses hire people are fewer of them and that s why it s downward sloping okay people want you were roses the yellow curve is the supply curve now after we derive the demand curve will then go in order so basically as the price goes up firms want to produce more roses at higher prices people want less of the good and we ll just will derive where that comes from shortly starting next lecture but for now I think it s pretty intuitive than at the price of roses hire people are fewer of them and that s why it s downward sloping okay people want you were roses the yellow curve is the supply curve now after we derived demand curve will then go harder so basically as the price goes up firms want to produce more roses final True the upward sloping supply curve where the points meet is the market equilibrium we re supplying to manmeet is the market at colibrium okay that is the point where both consumers and producers are happy to make a transaction consumers are happy because they are on their demand curve is hundred the point okay producer happy they are willing to supply that is the one point where consumers are happy and fruits are happy there for cf Librium confidence the upward sloping supply curve where the points meet is the market equilibrium we re supplying to manmeet is the market at colibrium okay that is the point where both consumers and producers are happy to make a transaction consumers are happy because they are on their demand curve is hundred the point okay producer happy they are willing to supply that is the one point where consumers are happy and fruits are happy there for CFA Librium the upward sloping supply curve where the points meat is the market equilibrium we re supplying to manmeet is the market at colibrium okay that is the point where both consumers and producers are happy to make a transaction consumers are happy because they are on their demand curve is hundred the point okay producer happy they are willing to supply that is the one point where consumers are happy and fruits are happy there for cf Librium the upward sloping supply curve where the points meat is the market equilibrium we re supplying to manmeet is the market of Librium okay that is the point where both consumers and producers are happy to make a transaction consumers are happy because they are on their demand curve is hundred the point okay producer happy they are willing to supply that is the one point where consumers are happy and fruits are happy there for cf Librium the upward sloping supply curve where the points meat is the market equilibrium we re supplying to Man meets is the market at colibrium okay that is the point where both consumers and producers are happy to make a transaction consumers are happy because they are on their demand curve is hundred the point okay producer happy they are willing to supply that is the one point where consumers are happy and fruits are happy there for CFA Librium final True now this raises lots of questions where the curse come from how does a columbarium get achieved why the heck do we give roses these are a bunch of questions we will we will all will come to all these questions over the next set of lectures but the basic thing is to understand the situation of Adam Smith supply and demand model OKAY questions about that okay confidence now this raises lots of questions where the curse come from how does a columbarium get achieved why the heck do we give roses these are a bunch of questions we will we will all will come to all these questions over the next set of lectures but the basic thing is to understand the situation of Adam Smith supply and demand model okay question about that okay now this raises lots of questions where the curse come from how does a columbarium get achieved why the heck do we give roses these are bunch of questions we will we will all will come to all these questions over the next set of lectures but the basic thing is to understand the situation of Adam Smith supply and demand model OKAY questions about that okay now this raises lots of questions where the curse come from how does a columbarium get achieved why the heck do we give roses these are bunch of questions we will we will all will come to all these questions over the next set of lectures but the basic thing is to understand the situation of Adam Smith supply and demand model okay question about that okay novice raises lots of questions where the curse come from how does a columbarium get achieved why the heck do we give roses these are a bunch of questions we will we will all will come to all these questions over the next set of lectures but the basic thing is to understand the situation of Adam Smith supply and demand model OKAY questions about that okay final True depositing ounces to study the way things are well north of analysis is to study the way things should be let me give you a great example which is eBay auctions okay example for the price the fewer people getting your getting to bed Supply is how how much how many units are there are for sale on eBay you didn t until those to meet and then you have a marketing colibrium at that price okay now confidence deposit has to study the way things are well north of analysis is to study the way things should be let me give you a great example which is eBay auctions okay example for the price the fewer people getting your getting to bed Supply is how how much how many units are there are for sale on eBay you didn t until those to meet and then you have a marketing colibrium at that price okay now depositing oz to study the way things are well north of analysis is to study the way things should be let me give you a great example which is eBay auctions okay example for the price the fewer people getting your getting to bed Supply is how how much how many units are there are for sale on eBay you didn t until those to meet and then you have a marketing colibrium at that price okay now deposit to study the way things are well north of analysis is to study the way things should be let me give you a great example which is eBay auctions okay example for the price the fewer people getting your getting to bed Supply is how how much how many units are there are for sale on eBay you didn t until those to meet and then you have a marketing colibrium at that price okay now deposit ounces to study the way things are well north of analysis is to study the way things should be let me give you a great example which is eBay auctions okay example for the price the fewer people getting your getting to bed Supply is how how much how many units are there are for sale on eBay you didn t until those to meet and then you have a marketing colibrium at that price okay now final True and what happened Benning would not start a it climb million before the auction was shut down here they decided they wouldn t allow you to sell your body on eBay bodily parts on eBay okay so this raises two questions the first is the positive question why did the price go so high confidence and what happened Benning would not start a it climb to million before the auction was shut down he met decided they wouldn t allow you to sell your body on eBay bodily parts on eBay okay so this raises two questions the first is the positive question why did the price go so high and what happened Benning would not start a it climb million before the auction was shut down here they decided they wouldn t allow you to sell your body on eBay bodily parts on eBay okay so this raises two questions the first is the positive question why did the price go so high and what happened Benning would not start a it climb to million before the auction was shut down here they decided they wouldn t allow you to sell your body on eBay bodily parts on eBay okay so this raises two questions the first is the positive question why did the price go so high and what happened bidding would not start a it climb million before the auction was shut down he met decided they wouldn t allow you to sell your body on eBay bodily parts on eBay okay so this raises two questions the first is the positive question why did the price go so high final True question deposit questions what happens if you do the normals question should you now just standard economics answer to start would be of course you should wear in the world where thousands of people die every year because there s a waiting list for kidney transplant okay and these are people would happily pay a lot of money to stay alive I presume meanwhile there s people walking around with two kidneys are poor and life could be changed by being paid a million dollars for the kidney and might be happy to take the risk that their other one can you be fine as it is for most everyone foremost their life confidence question deposit questions what happens if you do the normals question should you now just standard economics answer to start would be of course you should wear in the world where thousands of people die every year because there s a waiting list for kidney transplant okay and these are people would happily pay a lot of money to stay alive I presume meanwhile there s people walking around with two kidneys are poor and life could be changed by being paid a million dollars for the kidney and might be happy to take the risk that there other than one can you be fine as it is for most everyone foremost their life question deposit questions what happens if you do the normal questions should you now just standard economics answer to start would be of course you should wear in the world where thousands of people die every year because there s a waiting list for kidney transplant okay and these are people would happily pay a lot of money to stay alive I presume meanwhile there s people walking around with two kidneys are poor and life could be changed by being paid a million dollars for the kidney and might be happy to take the risk that there other than one kidney to be fine as it is for most everyone foremost their life question deposit questions what happens if you do the normals questions should you now just standard economics answer to start would be of course you should wear in the world where thousands of people die every year because there s a waiting list for kidney transplant okay and these are people would happily pay a lot of money to stay alive I presume meanwhile there s people walking around with two kidneys are poor and life could be changed by being paid a million dollars for the kidney and might be happy to take the risk that there other than one can you be fine as it is for most everyone foremost their life question deposit questions what happens if you do the normal question should you now just standard economics answer to start would be of course you should wear in the world where thousands of people die every year because there s a waiting list for kidney transplant okay and these are people would happily pay a lot of money to stay alive I presume meanwhile there s people walking around with two kidneys are poor and life could be changed by being paid a million dollars for the kidney and might be happy to take the risk that there other than one kidney to be fine as it is for most everyone foremost their life final True and they re what they are willing to pay huge amount for that the person who sells the kidney in most probability is fine cuz almost all of us can make if you like fine with one kidney and being a life changing amount of money that could allow them to pursue their dreams in various ways okay so would be okay confidence and they re what they are willing to pay huge amount for that the person who sells the kidney in most probability is fine cuz almost all of us can make if you like fine with one kidney and seeing a life changing amount of money that could allow them to pursue their dreams in various ways okay so would be okay and they re what they are willing to pay huge amount for that the person who sells the kidney in most probability is fine cuz almost all of us can make if you like fine with one kidney and being a life changing amount of money that could allow them to pursue their dreams in various ways okay so that would be okay and they re what they are willing to pay huge amount for that the person who sells the kidney in most probability is fine cuz almost all of us can make if you like fine with one kidney and seeing a life changing amount of money that could allow them to pursue their dreams in various ways okay so that would be okay and they re what they are willing to pay huge amount for that the person who sells the kidney in most probability is fine because almost all of us can make if you like fine with one kidney and seeing a life changing amount of money that could allow them to pursue their dreams in various ways okay so would be okay final True Apple could be the problem of fraud okay people might not be able to tell if they re getting allergic kidney or not okay there could be the example of do you know okay we ought to know that before okay these are the kinds of this is one type of problem which is the market maybe the market May Fail okay confidence Apple could be the problem of fraud people might not be able to tell if they re getting legit kidney or not okay there could be the example of do you know okay we ought to know that before okay these are the kinds of this is one type of problem which is the market maybe the market May Fail okay Temple could be the problem of fraud people might not be able to tell if they re getting legit kidney or not okay there could be the example of do you know okay we ought to know that before okay these are the kinds of this is one type of problem which is the market maybe the market May Fail okay Apple could be the problem of fraud people might not be able to tell if they re getting a legit kidney or not okay there could be the example of do you know okay we ought to know that before okay these are the kinds of this is one type of problem which is the market maybe the market May Fail okay Temple could be the problem of fraud people might not be able to tell if they re getting a legit kidney or not okay there could be the example of do you know okay we ought to know that before okay these are the kinds of this is one type of problem which is the market maybe the market May Fail okay final True or fairness which is we would end up with a world where only rich people get kidneys okay currently there s a bunch of voluntary donors and leftover okay and those go to a people on the base of where they aren t right now it s just going based on the waiting list but but it may be that someone further down the confidence or fairness which is we would end up with a world where only rich people get kidneys okay currently there s a bunch of voluntary donors and leftover okay and those go to a people on the base of where they are on the way right now it s just going based on the waiting list but but it may be that someone further down the or fairness which is we would end up with a world where only rich people get kidneys okay currently there s a bunch of voluntary donors and leftover okay and those go to a people on the base of where they aren t right now it s just going based on the waiting list but but it may be that someone further down or fairness which is we would end up with a world where only rich people get kidneys okay currently there s a bunch of voluntary donors and people who are leftover okay and those go to a people on the base of where they aren t right now it s just going based on the waiting list but but it may be that someone further down or fairness which is we would end up with a world where only rich people get kidneys okay currently there s a bunch of voluntary donors and leftover okay and those go to a people on the base of where they aren t right now it s just going based on a waiting list but but it may be that someone further down the final True does he know you make money off of selling kidney and they take advantage of people on very bad but black market for kidneys Behavior Behavior Behavior confidence cuz you know you can make money off of selling kidney and they take advantage of people on very bad but black market for kidneys Behavior Behavior Behavior does he know you can make money off of selling kidney and they take advantage of people on very bad but black market for kidneys Behavior Behavior Behavior do you make money off of selling kidney and they take advantage of people on very bad with black market for kidneys Behavior Behavior Behavior Santino you make money off of selling kidney and they take advantage of people on very bad but black market for kidneys Behavior Behavior Behavior final True and how mistakes can actually happen due to virus cognitive Pisces and other things in this world you can imagine people could make mistakes they could be they cannot really sit down and quite understand what they re doing and thinking of selling their kidney when it s really not in their own long term interest yeah confidence and how mistakes can actually happen due to virus cognitive Pisces and other things in this world you can imagine people could make mistakes they could be they cannot really sit down and quite understand what they re doing and they could have sold their kidneys when it s really not in their own long term interest yeah and how mistakes can actually happen due to virus cognitive Pisces and other things in this world you can imagine people could make mistakes they could be they cannot really sit down and quite understand what they re doing and thinking of selling their kidneys when it s really not in their own long term interest yeah and how mistakes can actually happen due to virus cognitive Pisces and other things in this world you can t imagine people could make mistakes they could be they cannot really sit down and quite understand what they re doing and they could have sold their kidneys when it s really not in their own long term interest yeah and how mistakes can actually happen due to virus cognitive Pisces and other things in this world you can t imagine people could make mistakes they could be they cannot really sit down and quite understand what they re doing and thinking of selling their kidneys when it s really not in their own long term interest yeah final True and so is inelastic demand such that we will always need kidneys confidence and so is inelastic demand such that people always need kidneys so is inelastic demand such that we will always need kidneys so is inelastic demand such that people always need kidneys and so is inelastic demand such that he will always need kidneys final True it s Corey s a right wing science economics at its core is all about how the market knows best okay and that basically government only mess things up that s sort of the basic a lot of a Wilderness Master View and how governments can improve things and he died confidence it s Corey s a right wing science economics at its core is all about how the market knows best okay and that basically government only mess things up that s sort of the basic a lot of a Wilderness Master View and how governments could improve things and he died it s Corey s a right wing science economics at its core is all about how the market knows best okay and that basically government only mess things up that s sort of the basic a lot of a Wilderness Master ask you and how governments could improve things and he died it s Corey s a right wing science economics at its core is all about how the market knows best okay and that basically government only mess things up that started the basic a lot of a Wilderness Master ask you and how governments could improve things and he died what score is a right wing science economics at its core is all about how the market knows best okay and that basically government only mess things up that s sort of the basic a lot of a Wilderness Master ask you and how governments improve things and he died final True birds that consumers decide what to what to do OK was not a wealthy nation was a very wealthy Nation years ago the most power still okay large Riven by the capitalist economy on the other hand we are a nation with tremendous inequality we are by far the most unequal major Nation the world okay the top of Americans has a much higher share of our income than any other large country in the world and a large developed country in the world the bottom income confidence birds that consumers decide what to what to do OK was not a wealthy nation was a very wealthy Nation years ago the most power still okay large Riven by the capitalist economy on the other hand we are a nation with tremendous inequality we are by far the most unequal major Nation the world okay the top of Americans has a much higher share of our income than any other large country in the world and a large developed country in the world the bottom birds that consumers decide what to what to do okay was not a wealthy nation was a very wealthy Nation years ago the most power still okay large Riven by the capitalist economy on the other hand we are a nation with tremendous inequality we are by far the most unequal major Nation the world okay the top of Americans has a much higher share of our income than any other large country in the world and a large developed country in the world the bottom income birds that consumers decide what to what to do OK was not a wealthy nation was a very wealthy Nation years ago the most power still okay large Riven by the capitalist economy on the other hand we are a nation with tremendous any quality we are by far the most unequal major Nation the world okay the top of Americans has a much higher share of our income than any other large country in the world and a large developed country in the world the bottom income birds that consumers decide what to what to do OK was not a wealthy nation was a very wealthy Nation years ago we are now the most powerful okay large Riven by the capitalist economy on the other hand we are a nation with tremendous inequality we are by far the most unequal major Nation the world okay the top of Americans has a much higher share of our income than any other large country in the world and a large developed country in the world the bottom income final True a lot of what happened during the financial meltdown it turns out it s hard to get people for information at cetera so we see the problems we ve grown very wealthy zanation we ve introduced a whole set of problems through the system is what s called a command economy in the capitalist economy is what s called a command economy okay in this case the government makes all the production cars this year OK and people can get them in some way could be a lottery could be waiting in line how we decide to allocate them we re not going to let them confidence a lot of what happened during the financial meltdown it turns out it s hard to get people for information at cetera so we see the problems we ve grown very wealthy zanation we ve introduced a whole set of problems through this system is what s called a command economy in the capitalist economy is what s called a command economy okay in this case the government makes all the production cars this year OK and people can get them in some way could be a lottery could be waiting in line how we decide to allocate them we re not going to let them a lot of what happened during the financial meltdown it turns out it s hard to get people for information xcetera so we see the problems we ve grown very wealthy zanation we ve introduced a whole set of problems through the system is what s called a command economy in the capitalist economy is what s called a command economy okay in this case the government makes all the production cars this year OK and people can get them in some way could be a lottery could be waiting in line how we decide to allocate them we re not going to let them a lot of what happened during the financial meltdown it turns out it s hard to get people for information xcetera so we see the problems we ve grown very wealthy zanation we ve introduced a whole set of problems through the system is what s called a command economy in the capitalist economy is what s called a command economy okay in this case the government makes all the production of cars this year OK and people can get them in some way could be a lottery could be waiting in line how we decide to allocate them we re not going to let them a lot of what happened during the financial meltdown it turns out it s hard to get people for information at cetera so we see the problems we ve grown very wealthy zanation we ve introduced the whole set of problems through the system is what s called a command economy in the capitalist economy is what s called a command economy okay in this case the government makes all the production cars this year OK and people can get them in some way could be a lottery could be waiting in line how we decide to allocate them we re not going to let them final True the government decide how much to produce who got it partly through corruption that is a party pizza party members party leaders got a first and often just threw waiting in line for the reigning application now in theory by making sure the command model simply doesn t work partly this is too many opportunities for corruption when the government controls everything that means there s no checks and balances on the the the opportunity for corruption the capital of confidence the government decide how much to produce who got it partly through corruption that is a party pizza party members party leaders got a first and often just threw waiting in line for the reigning application now in theory by making sure the command model simply doesn t work partly this is too many opportunities for corruption when the government controls everything that means there s no checks and balances on the the the opportunity for corruption the government decide how much to produce who got it partly through corruption that is a party pizza party members party leaders got a first and often just threw waiting in line for the reigning application now in theory by making sure the command model simply doesn t work partly this is too many opportunities for corruption when the government controls everything that means there s no checks and balances on the the the opportunity for corruption the capitalist the government decide how much to produce who got it partly through corruption that is a party pizza party members party leaders got a first and often just threw waiting in line for the reigning application now in theory by making sure the command model simply doesn t work partly this is too many opportunities for corruption when the government controls everything that means there s no checks and balances on the the the opportunity for corruption the capitals the government decide how much to produce who got it partly through corruption that is a party pizza party members party leaders got a first and often just threw waiting in line for the reigning application now in theory by making sure that was it the command model simply doesn t work partly this is too many opportunities for corruption when the government controls everything that means there s no checks and balances on the the the opportunity for corruption the capitalistic final True the Masters tribute things roughly a fortune what people want okay and that s where people want to be folks who want a certain kind of car are going to want to get to that kind of car and the government has it wrong they re going to get upset and it s going to lead to less functional economy okay so basically Adam Smith s view is that the Invisible Hand view is that consumers and firms serving their own best interest will do what is best for society is the consumers and firms serving their own best interest will do what ends up being best for society confidence the Masters tribute things roughly a fortune what people want okay and that s where people want to be folks who want a certain kind of car are going to want to get to that kind of car and the government has it wrong they re going to get upset and it s going to lead to less functional economy okay so basically Adam Smith s view is that the invisible hands you is that consumers and firms serving their own best interest will do what is best for society is the consumers and firms serving their own best interest will do what ends up being best for society the Masters tribute things roughly a fortune what people want okay and that s where people want to be folks who want a certain kind of car are going to want to get to that kind of car and the government has it wrong they re going to get upset and Skelita less functional economy okay so basically Adam Smith s view is that the Invisible Hand view is that consumers and firms serving their own best interest will do what is best for society is the consumers and firms serving their own best interest will do what ends up being best for society the Masters tribute things roughly a fortune what people want okay and that s where people want to be folks who want a certain kind of car are going to want to get to that kind of car and the government has it wrong they re going to get upset and it s going to lead to less functional economy okay so basically Adam Smith s view is that the Invisible Hand view is that consumers and firms serving their own best interest will do what is best for society view is the consumers and firms serving their own best interest will do what ends up being best for society the comedy will Master tribute things roughly a fortune what people want okay and that s where people want to be folks who want a certain kind of car are going to want to get to that kind of car and the government has it wrong they re going to get upset and Skelita less functional economy okay so basically Adam Smith s view is that the Invisible Hand view is that consumers and firms serving their own best interest will do what is best for society is the consumers and firms serving their own best interest will do what ends up being best for society final True talking about that for now we re going to find best for society as the most stuff gets produced and consumed to find it going to come to those before the first course that s for society means war Surplus which is the most stuff gets produced at people value okay so that s confidence talking about that for now we re going to find best for society as the most stuff gets produced and consumed to find it going to come to those before the first course that s for society means war Surplus which is the most stuff gets produced that people value okay so that s talking about that for now we re going to find best for society as the most stuff gets produced and consumed in the find it going to come to those before the first course that s for society means war Surplus which is the most stuff gets produced that people value okay so that s talking about that for now we re going to find best for society as the most stuff gets produced and consumed to find it going to come to those before the first course that s for society means war Surplus which is the most stuff gets produced of people value okay so that s talking about that for now we re going to find best for society as the most stuff gets produced and consumed to find it going to come to those before the first two thirds of the course that s for society means war Surplus which is the most stuff gets produced at people value okay so that s final True okay how does that happen Okay I m going to talk about that will start with demand which is how to Consumers decide what they want given their resources will talk about the principal dutilly maximization the idea that I have utility function what I want I ll have a budget constraint which is a resource I have and those who constrained optimization will say give me what I want and resource I have what decisions do I make confidence okay how does that happen Okay I m going to talk about that will start with demand which is how to Consumers decide what they want given their resources we ll talk about the principal dutilly maximization the idea that I have utility function what I want I ll have a budget constraint which is a resource I have and those who constrained optimization will say give me what I want and resource I have what decisions do I make okay how does that happen Okay I m going to talk about that will start with demand which is how to Consumers decide what they want given their resources will talk about the principal dutilly maximization the idea that I have utility function what I want I ll have a budget constraint which is a resource I have and those who constrained optimization will say give me what I want and resource I have what decision do I make okay how does that happen Okay I m going to talk about that will start with demand which is how to Consumers decide what they want given their resources we ll talk about the principal dutilly maximization the idea that I have utility function what I want I ll have a budget constraint which is a resource I have and those who constrained optimization will say give me what I want and resource I have what decision do I make okay how does that happen Okay I m going to talk about that will start with demand which is how to Consumers decide what they want given their resources will talk about the principal dutilly maximization the idea that I have utility function what I want I ll have a budget constraint which is the resource I have and those who constrained optimization will say give me what I want and resource I have what decision do I make final True grandma put it together to get market aqualibrium and talk about soda Smith s principles and then from there we ll talk about how it breaks down reality different teams in reality how there are various market failures they can get the way why we have to care about Equity what implications that has about behavioral economics about set of other factors okay this semester as I said okay confidence grandma put it together to get market aqualibrium and talk about soda Smith s principles and then from there we ll talk about how it breaks down reality different teams in reality how there are various market failures they can get the way why we have to care about Equity what implications that has about behavioral economics about set of other factors okay this semester as I said the lecture okay grandma put it together to get market aqualibrium and talk about soda Smith s principles and then from there we ll talk about how it breaks down reality different teams in reality how there are various market failures they can get the way why we have to care about Equity what implications that has about behavioural economics about set of other factors okay this semester as I said okay grandma put it together to get market aqualibrium and talk about soda Smith s principles and then from there we ll talk about how it breaks down reality different teams in reality how there are various market failures they can get the way why we have to care about Equity what implications that has about behavioral economics about set of other factors okay this semester as I said the lecture grandma put it together to get market aqualibrium and talk about soda Smith s principles and then from there we ll talk about how it breaks down reality different teams in reality how there are various market failures they can get the way why we have to care about Equity what implications that has about behavioural economics about set of other factors okay this semester as I said the lecture okay final True sorry for the problem sit and do that every week Okay this Friday the nd Friday is all new material we doing Friday is cover the mathematics I don t like doing that I was getting wrong okay so I leave okay so this Friday confidence for the prom sit and do that every week Okay this Friday the nd Friday is all new material we doing Friday is cover the mathematics I don t like doing that I was getting wrong okay so I leave okay so this Friday sorry for the problem sit and do that every week Okay this Friday the nd Fridays all new material we doing Friday is cover the mathematics I don t like doing that I was getting wrong okay so I leave okay so this Friday for the prom sit and do that every week Okay this Friday the nd Fridays all new material we doing Friday is cover the mathematics I don t like doing that I was getting wrong okay so I leave okay so this Friday sorry for the problem sit and do that every week Okay this Friday the nd Friday is all new material we doing Friday is cover the mathematics I don t like doing that I was getting wrong okay so I leave smarter than I am okay so this Friday final True \n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "FOR SUMMARISATION"
+      ],
+      "metadata": {
+        "id": "VzGkGwFbfHkd"
+      }
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "pQIQlLqyT7jh",
+        "outputId": "ab638349-660d-44b9-93d2-f23dc1132051"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: nltk in /usr/local/lib/python3.7/dist-packages (3.2.5)\n",
+            "Requirement already satisfied: six in /usr/local/lib/python3.7/dist-packages (from nltk) (1.15.0)\n",
+            "Requirement already satisfied: beautifulsoup4 in /usr/local/lib/python3.7/dist-packages (4.6.3)\n",
+            "Requirement already satisfied: lxml in /usr/local/lib/python3.7/dist-packages (4.2.6)\n"
+          ]
+        }
+      ],
+      "source": [
+        "!pip install nltk\n",
+        "!pip install beautifulsoup4\n",
+        "!pip install lxml"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "6lD3a6K-W8pm"
+      },
+      "outputs": [],
+      "source": [
+        "import spacy\n",
+        "from spacy.lang.en.stop_words import STOP_WORDS\n",
+        "from string import punctuation\n",
+        "from heapq import nlargest"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 217
+        },
+        "id": "btDPZf8fPG0c",
+        "outputId": "2d328d39-bc9a-444f-ba96-643319dd0a54"
+      },
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "FileNotFoundError",
+          "evalue": "ignored",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mFileNotFoundError\u001b[0m                         Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-7-d3bd6edae1dd>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m()\u001b[0m\n\u001b[1;32m     33\u001b[0m        \u001b[0mfile\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mwrite\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0msummary\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     34\u001b[0m     \u001b[0;32mreturn\u001b[0m \u001b[0msummary\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 35\u001b[0;31m \u001b[0mtext\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mopen\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"cleantext.txt\"\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m'r'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mread\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     36\u001b[0m \u001b[0msummarize\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mtext\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;36m0.05\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mFileNotFoundError\u001b[0m: [Errno 2] No such file or directory: 'cleantext.txt'"
+          ]
+        }
+      ],
+      "source": [
+        "def summarize(text, per):\n",
+        "    nlp = spacy.load('en_core_web_sm')\n",
+        "    doc= nlp(text)\n",
+        "    tokens=[token.text for token in doc]\n",
+        "    word_frequencies={}\n",
+        "    for word in doc:\n",
+        "        if word.text.lower() not in list(STOP_WORDS):\n",
+        "            if word.text.lower() not in punctuation:\n",
+        "                if word.text not in word_frequencies.keys():\n",
+        "                    word_frequencies[word.text] = 1\n",
+        "                else:\n",
+        "                    word_frequencies[word.text] += 1\n",
+        "    max_frequency=max(word_frequencies.values())\n",
+        "    for word in word_frequencies.keys():\n",
+        "        word_frequencies[word]=word_frequencies[word]/max_frequency\n",
+        "    sentence_tokens= [sent for sent in doc.sents]\n",
+        "    sentence_scores = {}\n",
+        "    for sent in sentence_tokens:\n",
+        "        for word in sent:\n",
+        "            if word.text.lower() in word_frequencies.keys():\n",
+        "                if sent not in sentence_scores.keys():\n",
+        "                    sentence_scores[sent]=word_frequencies[word.text.lower()]\n",
+        "                else:\n",
+        "                    sentence_scores[sent]+=word_frequencies[word.text.lower()]\n",
+        "    select_length=int(len(sentence_tokens)*per)\n",
+        "    summary=nlargest(select_length, sentence_scores,key=sentence_scores.get)\n",
+        "    final_summary=[word.text for word in summary]\n",
+        "    summary=''.join(final_summary)\n",
+        "    print(summary)\n",
+        "    with open('Summary.txt',mode ='w') as file:\n",
+        "       file.write(\"Recognized Speech:\")\n",
+        "       file.write(\"\\n\")\n",
+        "       file.write(summary)\n",
+        "    return summary\n",
+        "text = open(\"cleantext.txt\", 'r').read()\n",
+        "summarize(text, 0.05)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install sumy\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ZHPWPpsE3NoA",
+        "outputId": "9cfd1728-b3cc-49b7-8b89-e3440c721f83"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Collecting sumy\n",
+            "  Downloading sumy-0.10.0-py2.py3-none-any.whl (94 kB)\n",
+            "\u001b[?25l\r\u001b[K     |███▌                            | 10 kB 19.3 MB/s eta 0:00:01\r\u001b[K     |███████                         | 20 kB 14.3 MB/s eta 0:00:01\r\u001b[K     |██████████▍                     | 30 kB 10.2 MB/s eta 0:00:01\r\u001b[K     |██████████████                  | 40 kB 8.9 MB/s eta 0:00:01\r\u001b[K     |█████████████████▍              | 51 kB 4.4 MB/s eta 0:00:01\r\u001b[K     |████████████████████▉           | 61 kB 5.2 MB/s eta 0:00:01\r\u001b[K     |████████████████████████▎       | 71 kB 5.5 MB/s eta 0:00:01\r\u001b[K     |███████████████████████████▉    | 81 kB 5.6 MB/s eta 0:00:01\r\u001b[K     |███████████████████████████████▎| 92 kB 6.3 MB/s eta 0:00:01\r\u001b[K     |████████████████████████████████| 94 kB 1.8 MB/s \n",
+            "\u001b[?25hRequirement already satisfied: requests>=2.7.0 in /usr/local/lib/python3.7/dist-packages (from sumy) (2.23.0)\n",
+            "Collecting pycountry>=18.2.23\n",
+            "  Downloading pycountry-22.3.5.tar.gz (10.1 MB)\n",
+            "\u001b[K     |████████████████████████████████| 10.1 MB 29.5 MB/s \n",
+            "\u001b[?25h  Installing build dependencies ... \u001b[?25l\u001b[?25hdone\n",
+            "  Getting requirements to build wheel ... \u001b[?25l\u001b[?25hdone\n",
+            "    Preparing wheel metadata ... \u001b[?25l\u001b[?25hdone\n",
+            "Requirement already satisfied: nltk>=3.0.2 in /usr/local/lib/python3.7/dist-packages (from sumy) (3.2.5)\n",
+            "Collecting breadability>=0.1.20\n",
+            "  Downloading breadability-0.1.20.tar.gz (32 kB)\n",
+            "Requirement already satisfied: docopt<0.7,>=0.6.1 in /usr/local/lib/python3.7/dist-packages (from sumy) (0.6.2)\n",
+            "Requirement already satisfied: chardet in /usr/local/lib/python3.7/dist-packages (from breadability>=0.1.20->sumy) (3.0.4)\n",
+            "Requirement already satisfied: lxml>=2.0 in /usr/local/lib/python3.7/dist-packages (from breadability>=0.1.20->sumy) (4.2.6)\n",
+            "Requirement already satisfied: six in /usr/local/lib/python3.7/dist-packages (from nltk>=3.0.2->sumy) (1.15.0)\n",
+            "Requirement already satisfied: setuptools in /usr/local/lib/python3.7/dist-packages (from pycountry>=18.2.23->sumy) (57.4.0)\n",
+            "Requirement already satisfied: idna<3,>=2.5 in /usr/local/lib/python3.7/dist-packages (from requests>=2.7.0->sumy) (2.10)\n",
+            "Requirement already satisfied: urllib3!=1.25.0,!=1.25.1,<1.26,>=1.21.1 in /usr/local/lib/python3.7/dist-packages (from requests>=2.7.0->sumy) (1.24.3)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.7/dist-packages (from requests>=2.7.0->sumy) (2021.10.8)\n",
+            "Building wheels for collected packages: breadability, pycountry\n",
+            "  Building wheel for breadability (setup.py) ... \u001b[?25l\u001b[?25hdone\n",
+            "  Created wheel for breadability: filename=breadability-0.1.20-py2.py3-none-any.whl size=21712 sha256=aa0b742285d51c45c9af624937872a388629a66da35cd5c73965452ed7f27af3\n",
+            "  Stored in directory: /root/.cache/pip/wheels/d4/bf/51/81d27ad638e1a6dca4f362ecc33d1e2c764b8ea7ec751b8fc1\n",
+            "  Building wheel for pycountry (PEP 517) ... \u001b[?25l\u001b[?25hdone\n",
+            "  Created wheel for pycountry: filename=pycountry-22.3.5-py2.py3-none-any.whl size=10681845 sha256=959db409e91457b0dcf36c71b6d41bf8eb72453988b8d3677a6a9031fadcbdc8\n",
+            "  Stored in directory: /root/.cache/pip/wheels/0e/06/e8/7ee176e95ea9a8a8c3b3afcb1869f20adbd42413d4611c6eb4\n",
+            "Successfully built breadability pycountry\n",
+            "Installing collected packages: pycountry, breadability, sumy\n",
+            "Successfully installed breadability-0.1.20 pycountry-22.3.5 sumy-0.10.0\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import nltk\n",
+        "nltk.download('punkt')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "xMn1XNkZ5S4c",
+        "outputId": "d53c1959-c6e0-442f-8362-bc5bcb9c6a40"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "[nltk_data] Downloading package punkt to /root/nltk_data...\n",
+            "[nltk_data]   Unzipping tokenizers/punkt.zip.\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "True"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 14
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from gensim.summarization.summarizer import summarize\n",
+        "\n",
+        "# Spacy Imports\n",
+        "import spacy\n",
+        "from spacy.lang.en.stop_words import STOP_WORDS\n",
+        "\n",
+        "# NLTK Imports\n",
+        "from nltk.corpus import stopwords\n",
+        "from nltk.tokenize import word_tokenize, sent_tokenize\n",
+        "\n",
+        "# Sumy Imports\n",
+        "from sumy.parsers.plaintext import PlaintextParser\n",
+        "from sumy.nlp.tokenizers import Tokenizer\n",
+        "from sumy.summarizers.lsa import LsaSummarizer\n",
+        "from sumy.summarizers.luhn import LuhnSummarizer\n",
+        "from sumy.summarizers.text_rank import TextRankSummarizer\n",
+        "from sumy.nlp.stemmers import Stemmer\n",
+        "from sumy.utils import get_stop_words\n",
+        "\n",
+        "# Other Imports\n",
+        "from string import punctuation\n",
+        "from heapq import nlargest\n",
+        "\n",
+        "\n",
+        "def gensim_summarize(text_content, percent):\n",
+        "    # TextRank Summarization using Gensim Library.\n",
+        "    # Split is false, gensim return strings joined by \"\\n\". if true, gensim will return list\n",
+        "    summary = summarize(text_content, ratio=(int(percent) / 100), split=False).replace(\"\\n\", \" \")\n",
+        "\n",
+        "    # Returning NLTK Summarization Output\n",
+        "    return summary\n",
+        "\n",
+        "\n",
+        "def spacy_summarize(text_content, percent):\n",
+        "    # Frequency Based Summarization using Spacy.\n",
+        "    # Build a List of Stopwords\n",
+        "    stop_words = list(STOP_WORDS)\n",
+        "\n",
+        "    # import punctuations from strings library.\n",
+        "    punctuation_items = punctuation + '\\n'\n",
+        "\n",
+        "    # Loading en_core_web_sm in Spacy\n",
+        "    nlp = spacy.load('en_core_web_sm')\n",
+        "\n",
+        "    # Build an NLP Object\n",
+        "    nlp_object = nlp(text_content)\n",
+        "\n",
+        "    # Create the dictionary with key as words and value as number of times word is repeated.\n",
+        "    # Scoring words by its occurrence.\n",
+        "    word_frequencies = {}\n",
+        "    for word in nlp_object:\n",
+        "        if word.text.lower() not in stop_words:\n",
+        "            if word.text.lower() not in punctuation_items:\n",
+        "                if word.text not in word_frequencies.keys():\n",
+        "                    word_frequencies[word.text] = 1\n",
+        "                else:\n",
+        "                    word_frequencies[word.text] += 1\n",
+        "\n",
+        "    # Finding frequency of most occurring word\n",
+        "    max_frequency = max(word_frequencies.values())\n",
+        "\n",
+        "    # Divide Number of occurrences of all words by the max_frequency\n",
+        "    for word in word_frequencies.keys():\n",
+        "        word_frequencies[word] = word_frequencies[word] / max_frequency\n",
+        "\n",
+        "    # Save a sentence-tokenized copy of text\n",
+        "    sentence_token = [sentence for sentence in nlp_object.sents]\n",
+        "\n",
+        "    # Create the dictionary with key as sentences and value as sum of each important word.\n",
+        "    # Scoring sentences by its words.\n",
+        "    sentence_scores = {}\n",
+        "    for sent in sentence_token:\n",
+        "        sentence = sent.text.split(\" \")\n",
+        "        for word in sentence:\n",
+        "            if word.lower() in word_frequencies.keys():\n",
+        "                if sent not in sentence_scores.keys():\n",
+        "                    sentence_scores[sent] = word_frequencies[word.lower()]\n",
+        "                else:\n",
+        "                    sentence_scores[sent] += word_frequencies[word.lower()]\n",
+        "\n",
+        "    # Finding number of sentences and applying percentage on it: since we require to show most X% lines in summary.\n",
+        "    select_length = int(len(sentence_token) * (int(percent) / 100))\n",
+        "\n",
+        "    # Using nlargest library to get the top x% weighted sentences.\n",
+        "    summary = nlargest(select_length, sentence_scores, key=sentence_scores.get)\n",
+        "\n",
+        "    # Later joining it to get the final summarized text.\n",
+        "    final_summary = [word.text for word in summary]\n",
+        "    summary = ' '.join(final_summary)\n",
+        "\n",
+        "    # Returning NLTK Summarization Output\n",
+        "    return summary\n",
+        "\n",
+        "\n",
+        "def nltk_summarize(text_content, percent):\n",
+        "    # Frequency Based Summarization using NLTK\n",
+        "    # Store a tokenized copy of text, using NLTK's recommended word tokenizer\n",
+        "    tokens = word_tokenize(text_content)\n",
+        "\n",
+        "    # Import the stop words from NLTK toolkit\n",
+        "    stop_words = stopwords.words('english')\n",
+        "\n",
+        "    # import punctuations from strings library.\n",
+        "    punctuation_items = punctuation + '\\n'\n",
+        "\n",
+        "    # Create the dictionary with key as words and value as number of times word is repeated.\n",
+        "    # Scoring words by its occurrence.\n",
+        "    word_frequencies = {}\n",
+        "    for word in tokens:\n",
+        "        if word.lower() not in stop_words:\n",
+        "            if word.lower() not in punctuation_items:\n",
+        "                if word not in word_frequencies.keys():\n",
+        "                    word_frequencies[word] = 1\n",
+        "                else:\n",
+        "                    word_frequencies[word] += 1\n",
+        "\n",
+        "    # Finding frequency of most occurring word\n",
+        "    max_frequency = max(word_frequencies.values())\n",
+        "\n",
+        "    # Divide Number of occurrences of all words by the max_frequency\n",
+        "    for word in word_frequencies.keys():\n",
+        "        word_frequencies[word] = word_frequencies[word] / max_frequency\n",
+        "\n",
+        "    # Save a sentence-tokenized copy of text\n",
+        "    sentence_token = sent_tokenize(text_content)\n",
+        "\n",
+        "    # Create the dictionary with key as sentences and value as sum of each important word.\n",
+        "    # Scoring sentences by its words.\n",
+        "    sentence_scores = {}\n",
+        "    for sent in sentence_token:\n",
+        "        sentence = sent.split(\" \")\n",
+        "        for word in sentence:\n",
+        "            if word.lower() in word_frequencies.keys():\n",
+        "                if sent not in sentence_scores.keys():\n",
+        "                    sentence_scores[sent] = word_frequencies[word.lower()]\n",
+        "                else:\n",
+        "                    sentence_scores[sent] += word_frequencies[word.lower()]\n",
+        "\n",
+        "    # Finding number of sentences and applying percentage on it: since we require to show most X% lines in summary.\n",
+        "    select_length = int(len(sentence_token) * (int(percent) / 100))\n",
+        "\n",
+        "    # Using nlargest library to get the top x% weighted sentences.\n",
+        "    summary = nlargest(select_length, sentence_scores, key=sentence_scores.get)\n",
+        "\n",
+        "    # Later joining it to get the final summarized text.\n",
+        "    final_summary = [word for word in summary]\n",
+        "    summary = ' '.join(final_summary)\n",
+        "\n",
+        "    # Returning NLTK Summarization Output\n",
+        "    return summary\n",
+        "\n",
+        "\n",
+        "def sumy_lsa_summarize(text_content, percent):\n",
+        "    # Latent Semantic Analysis is a unsupervised learning algorithm that can be used for extractive text summarization.\n",
+        "    # Initializing the parser\n",
+        "    parser = PlaintextParser.from_string(text_content, Tokenizer(\"english\"))\n",
+        "    # Initialize the stemmer\n",
+        "    stemmer = Stemmer('english')\n",
+        "    # Initializing the summarizer\n",
+        "    summarizer = LsaSummarizer(stemmer)\n",
+        "    summarizer.stop_words = get_stop_words('english')\n",
+        "\n",
+        "    # Finding number of sentences and applying percentage on it: since sumy requires number of lines\n",
+        "    sentence_token = sent_tokenize(text_content)\n",
+        "    select_length = int(len(sentence_token) * (int(percent) / 100))\n",
+        "\n",
+        "    # Evaluating and saving the Summary\n",
+        "    summary = \"\"\n",
+        "    for sentence in summarizer(parser.document, sentences_count=select_length):\n",
+        "        summary += str(sentence)\n",
+        "    # Returning NLTK Summarization Output\n",
+        "    return summary\n",
+        "\n",
+        "\n",
+        "def sumy_luhn_summarize(text_content, percent):\n",
+        "    # A naive approach based on TF-IDF and looking at the “window size” of non-important words between words of high\n",
+        "    # importance. It also assigns higher weights to sentences occurring near the beginning of a document.\n",
+        "    # Initializing the parser\n",
+        "    parser = PlaintextParser.from_string(text_content, Tokenizer(\"english\"))\n",
+        "    # Initialize the stemmer\n",
+        "    stemmer = Stemmer('english')\n",
+        "    # Initializing the summarizer\n",
+        "    summarizer = LuhnSummarizer(stemmer)\n",
+        "    summarizer.stop_words = get_stop_words('english')\n",
+        "\n",
+        "    # Finding number of sentences and applying percentage on it: since sumy requires number of lines\n",
+        "    sentence_token = sent_tokenize(text_content)\n",
+        "    select_length = int(len(sentence_token) * (int(percent) / 100))\n",
+        "\n",
+        "    # Evaluating and saving the Summary\n",
+        "    summary = \"\"\n",
+        "    for sentence in summarizer(parser.document, sentences_count=select_length):\n",
+        "        summary += str(sentence)\n",
+        "    # Returning NLTK Summarization Output\n",
+        "    return summary\n",
+        "\n",
+        "\n",
+        "def sumy_text_rank_summarize(text_content, percent):\n",
+        "    # TextRank is an unsupervised text summarization technique that uses the intuition behind the PageRank algorithm.\n",
+        "    # Initializing the parser\n",
+        "    parser = PlaintextParser.from_string(text_content, Tokenizer(\"english\"))\n",
+        "    # Initialize the stemmer\n",
+        "    stemmer = Stemmer('english')\n",
+        "    # Initializing the summarizer\n",
+        "    summarizer = TextRankSummarizer(stemmer)\n",
+        "    summarizer.stop_words = get_stop_words('english')\n",
+        "\n",
+        "    # Finding number of sentences and applying percentage on it: since sumy requires number of lines\n",
+        "    sentence_token = sent_tokenize(text_content)\n",
+        "    select_length = int(len(sentence_token) * (int(percent) / 100))\n",
+        "\n",
+        "    # Evaluating and saving the Summary\n",
+        "    summary = \" \"\n",
+        "    for sentence in summarizer(parser.document, sentences_count=select_length):\n",
+        "        summary += str(sentence)\n",
+        "    # Returning NLTK Summarization Output\n",
+        "\n",
+        "    return summary\n",
+        "text_content = open(\"cleantext.txt\", 'r').read()\n",
+        "gensim_summarize(text_content, 1)\n"
+      ],
+      "metadata": {
+        "id": "4eBIoYfNO10c",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 381
+        },
+        "outputId": "c6cd137e-bd39-4178-cbe1-f82b086b8aeb"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "ValueError",
+          "evalue": "ignored",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mValueError\u001b[0m                                Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-19-966704a52de3>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m()\u001b[0m\n\u001b[1;32m    218\u001b[0m     \u001b[0;32mreturn\u001b[0m \u001b[0msummary\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    219\u001b[0m \u001b[0mtext_content\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mopen\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"cleantext.txt\"\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m'r'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mread\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 220\u001b[0;31m \u001b[0mgensim_summarize\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mtext_content\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;36m0.5\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+            "\u001b[0;32m<ipython-input-19-966704a52de3>\u001b[0m in \u001b[0;36mgensim_summarize\u001b[0;34m(text_content, percent)\u001b[0m\n\u001b[1;32m     26\u001b[0m     \u001b[0;31m# TextRank Summarization using Gensim Library.\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     27\u001b[0m     \u001b[0;31m# Split is false, gensim return strings joined by \"\\n\". if true, gensim will return list\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 28\u001b[0;31m     \u001b[0msummary\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0msummarize\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mtext_content\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mratio\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mint\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mpercent\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m/\u001b[0m \u001b[0;36m100\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0msplit\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mFalse\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mreplace\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"\\n\"\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m\" \"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     29\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     30\u001b[0m     \u001b[0;31m# Returning NLTK Summarization Output\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.7/dist-packages/gensim/summarization/summarizer.py\u001b[0m in \u001b[0;36msummarize\u001b[0;34m(text, ratio, word_count, split)\u001b[0m\n\u001b[1;32m    420\u001b[0m     \u001b[0;31m# If only one sentence is present, the function raises an error (Avoids ZeroDivisionError).\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    421\u001b[0m     \u001b[0;32mif\u001b[0m \u001b[0mlen\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0msentences\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m==\u001b[0m \u001b[0;36m1\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 422\u001b[0;31m         \u001b[0;32mraise\u001b[0m \u001b[0mValueError\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"input must have more than one sentence\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    423\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    424\u001b[0m     \u001b[0;31m# Warns if the text is too short.\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mValueError\u001b[0m: input must have more than one sentence"
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "display_name": "Python 3",
+      "name": "python3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 0
+}
